@@ -33,9 +33,7 @@ export const defaultConfig = {
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@browser': path.resolve(__dirname, './src/browser'),
-      '@features': path.resolve(__dirname, './src/features'),
-      '@store': path.resolve(__dirname, './src/store'),
-      '@utils': path.resolve(__dirname, './src/utils'),
+      '@components': path.resolve(__dirname, './src/components'),
     },
   },
 

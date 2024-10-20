@@ -16,9 +16,7 @@
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./*"],
-      "@app/*": ["src/*"],
       "@browser/*": ["src/browser/*"],
-      "@features/*": ["src/features/*"],
       "@components/*": ["src/components/*"]
     }
   },

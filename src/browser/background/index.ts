@@ -8,7 +8,7 @@ if (import.meta.hot) {
   // @ts-expect-error for background HMR
   import('/@vite/client');
   // load latest content script
-  import('./helpers/content-script-HMR');
+  import('@browser/background/helpers/content-script-HMR');
 }
 
 // remove or turn this off if you don't use side panel
