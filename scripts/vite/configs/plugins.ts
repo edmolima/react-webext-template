@@ -10,10 +10,11 @@ import { Manifest } from 'webextension-polyfill';
  * @param {Manifest.WebExtensionManifest} manifest - The manifest to be used for building the browser extension.
  * @returns {Object} An object containing the plugins array to use for the build.
  */
-export const plugins = (manifest: Manifest.WebExtensionManifest) => {
-  const cmdIsBuildExtension = process.env.BUILD_EXTENSION === 'true';
 
-  if (cmdIsBuildExtension) {
+const shouldGenerateManifest = process.env.BUILD_TARGET === 'manifest';
+
+export const plugins = (manifest: Manifest.WebExtensionManifest) => {
+  if (shouldGenerateManifest) {
     return {
       plugins: [
         react(),

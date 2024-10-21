@@ -1,14 +1,23 @@
 import path from 'node:path';
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const projectRoot = path.resolve(__dirname, '../../../');
 const resolvePath = (...args: string[]) => path.resolve(projectRoot, ...args);
 
-const isDev = process.env.NODE_ENV !== 'production';
+const buildTarget = process.env.BUILD_TARGET;
 
-/**
- * Base build configuration shared between default and extension builds.
- */
-const baseBuildConfig = {
+import packageJson from '../../../package.json';
+
+enum BuildTarget {
+  Background = 'background',
+  ContentScript = 'content-script',
+  Sidebar = 'sidebar',
+  Options = 'options',
+  Popup = 'popup',
+}
+
+const defaultConfig = {
   build: {
     watch: isDev ? {} : undefined,
     outDir: resolvePath('dist'),
@@ -18,55 +27,108 @@ const baseBuildConfig = {
     terserOptions: {
       mangle: false,
     },
+  },
+};
+
+const backgroundConfig = {
+  build: {
+    ...defaultConfig.build,
+    lib: {
+      entry: resolvePath(projectRoot, 'src/browser/background/index.ts'),
+      name: packageJson.name,
+      formats: ['iife'],
+    },
     rollupOptions: {
-      input: {
-        options: resolvePath('index.html'),
-        popup: resolvePath('index.html'),
-        sidepanel: resolvePath('index.html'),
-      },
       output: {
-        entryFileNames: ({ name }: { name: string }) => `${name}/index.js`,
+        entryFileNames: 'background/index.mjs',
+        extend: true,
       },
     },
   },
 };
 
-/**
- * Generates the build configuration based on the BUILD_EXTENSION environment variable.
- *
- * @returns {Object} Build configuration for Vite.
- */
-const buildConfig = () => {
-  const cmdIsBuildExtension = process.env.BUILD_EXTENSION === 'true';
-
-  if (cmdIsBuildExtension) {
-    // Build configuration for the extension files, merging rollupOptions
-    return {
-      build: {
-        ...baseBuildConfig.build,
-        rollupOptions: {
-          ...baseBuildConfig.build.rollupOptions,
-          input: {
-            ...baseBuildConfig.build.rollupOptions.input,
-            'content-script': resolvePath(
-              'src/browser/content-script/index.tsx',
-            ),
-            background: resolvePath('src/browser/background/index.ts'),
-          },
-          output: {
-            ...baseBuildConfig.build.rollupOptions.output,
-          },
-        },
+const contentScriptConfig = {
+  build: {
+    ...defaultConfig.build,
+    lib: {
+      entry: resolvePath(projectRoot, 'src/browser/content-script/index.tsx'),
+      name: packageJson.name,
+      formats: ['iife'],
+    },
+    rollupOptions: {
+      output: {
+        entryFileNames: 'content-script/index.mjs',
+        extend: true,
       },
-    };
-  } else {
-    // Default build configuration
-    return baseBuildConfig;
-  }
+    },
+  },
 };
 
-/**
- * Export the build configuration.
- */
+const optionsConfig = {
+  build: {
+    ...defaultConfig.build,
+    rollupOptions: {
+      input: {
+        options: resolvePath(projectRoot, 'src/browser/options/index.tsx'),
+      },
+      output: {
+        entryFileNames: 'options/index.mjs',
+        extend: true,
+      },
+    },
+  },
+};
+
+const popupConfig = {
+  build: {
+    ...defaultConfig.build,
+    rollupOptions: {
+      input: {
+        popup: resolvePath(projectRoot, 'src/browser/popup/index.tsx'),
+      },
+      output: {
+        entryFileNames: 'popup/index.mjs',
+        extend: true,
+      },
+    },
+  },
+};
+
+const sidebarConfig = {
+  build: {
+    ...defaultConfig.build,
+    rollupOptions: {
+      input: {
+        sidepanel: resolvePath(projectRoot, 'src/browser/sidebar/index.tsx'),
+      },
+      output: {
+        entryFileNames: 'sidebar/index.mjs',
+        extend: true,
+      },
+    },
+  },
+};
+
+const buildConfig = () => {
+  switch (buildTarget) {
+    case BuildTarget.Background:
+      return backgroundConfig;
+
+    case BuildTarget.ContentScript:
+      return contentScriptConfig;
+
+    case BuildTarget.Options:
+      return optionsConfig;
+
+    case BuildTarget.Popup:
+      return popupConfig;
+
+    case BuildTarget.Sidebar:
+      return sidebarConfig;
+
+    default:
+      return defaultConfig;
+  }
+};
 
 export const build = buildConfig();
