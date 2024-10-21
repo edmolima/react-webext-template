@@ -18,11 +18,11 @@ export const manifestConditionalConfig = (
   const withSidePanel = isFirefox
     ? {
         ...config,
-        sidebar_action: { default_panel: 'sidepanel/index.html' },
+        sidebar_action: { default_panel: 'sidebar/index.mjs' },
       }
     : {
         ...config,
-        side_panel: { default_path: 'sidepanel/index.html' },
+        side_panel: { default_path: 'sidepanel/index.mjs' },
       };
 
   // Conditionally add development-specific configurations

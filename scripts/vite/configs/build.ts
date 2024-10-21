@@ -7,6 +7,8 @@ const resolvePath = (...args: string[]) => path.resolve(projectRoot, ...args);
 
 const buildTarget = process.env.BUILD_TARGET;
 
+const isFirefox = process.env.EXTENSION === 'firefox';
+
 import packageJson from '../../../package.json';
 
 enum BuildTarget {
@@ -102,7 +104,7 @@ const sidebarConfig = {
         sidepanel: resolvePath(projectRoot, 'src/browser/sidebar/index.tsx'),
       },
       output: {
-        entryFileNames: 'sidebar/index.mjs',
+        entryFileNames: isFirefox ? 'sidebar/index.mjs' : 'sidepanel/index.mjs',
         extend: true,
       },
     },
